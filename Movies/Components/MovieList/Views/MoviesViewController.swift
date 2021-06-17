@@ -46,8 +46,12 @@ class MoviesViewController: UIViewController {
     }
     
     private func loadMoreData() {
-        viewModel.page = viewModel.page + 1
-        viewModel.fetchMovies()
+        viewModel.sortTaped = false
+        if !viewModel.isLoading {
+            viewModel.page = viewModel.page + 1
+            viewModel.isLoading = true
+            viewModel.fetchMovies()
+        }
     }
     
     private func scrollToTop() {

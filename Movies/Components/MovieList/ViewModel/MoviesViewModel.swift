@@ -12,6 +12,7 @@ class MovieViewModel: BaseViewModel {
     var movie: Movie?
     var movies: [MovieResult] = []
     var sortTaped = false
+    var isLoading = false
     
     weak var delegate: MoviesFetchedDelegate?
     
@@ -19,6 +20,7 @@ class MovieViewModel: BaseViewModel {
         didSet {
             sortTaped = true
             page = 1
+            isLoading = false
             movies.removeAll()
             fetchMovies()
         }
@@ -39,11 +41,7 @@ class MovieViewModel: BaseViewModel {
     }
     
     func fetchMovies() {
-        var endpoint = API.completeURL(.popularMovies, with: page)
-        if movieSort == .topRated {
-            endpoint = API.completeURL(.topRatedMovies, with: page)
-        }
-        
+        let endpoint = movieSort == .topRated ? API.completeURL(.topRatedMovies, with: page) : API.completeURL(.popularMovies, with: page)
         networkService.delegate = self
         networkService.request(endpoint: endpoint, responseType: Movie.self)
     }
@@ -59,7 +57,7 @@ extension MovieViewModel: ResponseServiceDelegate {
     func responseSuccess<T>(_ response: T?) where T : Decodable {
         if let res = response as? Movie {
             self.movie = res
-            
+            isLoading = false
             fillMovies()
         }
     }
